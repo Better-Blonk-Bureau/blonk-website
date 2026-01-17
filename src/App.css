@@ -6,8 +6,7 @@
 }
 
 .pompompurin {
-  height: 100%;
-  padding: 1.5em;
+  height: 25%;
   will-change: filter;
   transition: filter 300ms;
 }
