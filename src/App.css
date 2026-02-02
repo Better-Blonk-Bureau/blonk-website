@@ -1,31 +1,5 @@
+/* App-level styles - most styles are in component CSS files */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.pompompurin {
-  height: 25%;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.pompompurin:hover {
-  filter: drop-shadow(0 0 2em #e9b310aa);
-  animation: pompompurin-spin infinite 1.5s linear;
-}
-
-@keyframes pompompurin-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .pompompurin {
-    animation: pompompurin-spin infinite 20s linear;
-  }
+  width: 100%;
+  min-height: 100vh;
 }

@@ -1,0 +1,232 @@
+/* ========================================
+   LANDING PAGE LAYOUT
+   ======================================== */
+
+.landing-page {
+  min-height: 300vh;
+  position: relative;
+  background: #0a0a0a;
+}
+
+/* ========================================
+   SCROLL OVERLAY
+   ======================================== */
+
+.scroll-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(10, 10, 10, 0.7) 0%,
+    rgba(10, 10, 10, 0.95) 70%,
+    rgba(10, 10, 10, 1) 100%
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ========================================
+   HERO SECTION (First viewport)
+   ======================================== */
+
+.hero-section {
+  height: 100vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 60px;
+  position: relative;
+  z-index: 5;
+}
+
+.scroll-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  transition: opacity 0.3s ease;
+}
+
+.scroll-arrow {
+  animation: bounce-down 2s ease-in-out infinite;
+}
+
+.scroll-arrow span {
+  font-size: 20px;
+}
+
+@keyframes bounce-down {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}
+
+/* ========================================
+   REVEAL SECTION (Second viewport)
+   ======================================== */
+
+.reveal-section {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 20;
+}
+
+.title-container {
+  text-align: center;
+  opacity: 0;
+  transform: translateY(50px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.title-container.visible {
+  opacity: 1;
+}
+
+.presents {
+  font-size: clamp(14px, 2vw, 20px);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+.main-title {
+  margin: 0;
+  line-height: 1;
+}
+
+.title-blonk {
+  font-size: clamp(80px, 20vw, 200px);
+  font-weight: 800;
+  background: linear-gradient(
+    135deg,
+    #fff 0%,
+    #e0e0e0 25%,
+    #fff 50%,
+    #c0c0c0 75%,
+    #fff 100%
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 8s ease-in-out infinite;
+  letter-spacing: -0.02em;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.tagline {
+  font-size: clamp(16px, 3vw, 28px);
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 24px;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+}
+
+/* ========================================
+   INFO SECTION (Third viewport)
+   ======================================== */
+
+.info-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 20;
+}
+
+.info-content {
+  text-align: center;
+}
+
+.coming-soon {
+  font-size: clamp(18px, 3vw, 32px);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 30px;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+}
+
+.contact-link {
+  display: inline-block;
+  font-size: clamp(16px, 2vw, 24px);
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  padding: 16px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.contact-link:hover {
+  color: rgba(255, 255, 255, 1);
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 40px rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  .presents {
+    letter-spacing: 0.2em;
+  }
+
+  .tagline {
+    letter-spacing: 0.1em;
+  }
+
+  .scroll-hint {
+    padding-bottom: 20px;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-arrow {
+    animation: none;
+  }
+
+  .title-blonk {
+    animation: none;
+    background: #fff;
+    -webkit-text-fill-color: #fff;
+  }
+
+  .title-container {
+    transition: opacity 0.3s ease;
+  }
+}
