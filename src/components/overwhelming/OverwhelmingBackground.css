@@ -73,6 +73,13 @@
    RESPONSIVE ADJUSTMENTS
    ======================================== */
 
+/* Scale up items on larger screens */
+@media (min-width: 1400px) {
+  .overwhelming-item > * {
+    transform: scale(1.5);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .overwhelming-item {
     animation: item-spawn-reduced 0.3s ease-out forwards;
