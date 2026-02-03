@@ -1,43 +1,43 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { OverwhelmingBackground } from '../components/overwhelming';
 import './LandingPage.css';
 
 export function LandingPage() {
-    const [scrollProgress, setScrollProgress] = useState(0);
-    const [showTitle, setShowTitle] = useState(false);
-    const contentRef = useRef<HTMLDivElement>(null);
+    const pageRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleScroll = () => {
+            if (!pageRef.current) return;
+
             const scrollY = window.scrollY;
             const windowHeight = window.innerHeight;
             const progress = Math.min(scrollY / windowHeight, 1);
-            setScrollProgress(progress);
 
-            // Show title when scrolled past 30%
-            setShowTitle(progress > 0.3);
+            // Update CSS variable directly - no React re-render
+            pageRef.current.style.setProperty('--scroll-progress', String(progress));
+
+            // Toggle class for title visibility (only when crossing threshold)
+            const titleContainer = pageRef.current.querySelector('.title-container');
+            if (titleContainer) {
+                titleContainer.classList.toggle('visible', progress > 0.3);
+            }
         };
 
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     return (
-        <div className="landing-page">
+        <div className="landing-page" ref={pageRef}>
             {/* Overwhelming background - always visible */}
             <OverwhelmingBackground itemCount={50} spawnInterval={100} initialDelay={300} />
 
             {/* Gradient overlay that fades in on scroll */}
-            <div
-                className="scroll-overlay"
-                style={{
-                    opacity: scrollProgress * 0.85,
-                }}
-            />
+            <div className="scroll-overlay" />
 
             {/* First viewport - just the chaos */}
             <section className="hero-section">
-                <div className="scroll-hint" style={{ opacity: 1 - scrollProgress * 2 }}>
+                <div className="scroll-hint">
                     <span>scroll down</span>
                     <div className="scroll-arrow">
                         <span>&#8595;</span>
@@ -46,13 +46,8 @@ export function LandingPage() {
             </section>
 
             {/* Second viewport - the reveal */}
-            <section className="reveal-section" ref={contentRef}>
-                <div
-                    className={`title-container ${showTitle ? 'visible' : ''}`}
-                    style={{
-                        transform: `translateY(${(1 - scrollProgress) * 50}px)`,
-                    }}
-                >
+            <section className="reveal-section">
+                <div className="title-container">
                     <p className="presents">Better Blonk Bureau presents:</p>
                     <h1 className="main-title">
                         <span className="title-blonk">blonk</span>

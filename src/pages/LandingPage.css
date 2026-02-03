@@ -6,6 +6,7 @@
     min-height: 300vh;
     position: relative;
     background: #0a0a0a;
+    --scroll-progress: 0;
 }
 
 /* ========================================
@@ -26,6 +27,8 @@
     );
     pointer-events: none;
     z-index: 10;
+    opacity: calc(var(--scroll-progress) * 0.85);
+    will-change: opacity;
 }
 
 /* ========================================
@@ -51,7 +54,8 @@
     font-size: 14px;
     letter-spacing: 0.1em;
     text-transform: lowercase;
-    transition: opacity 0.3s ease;
+    opacity: calc(1 - var(--scroll-progress) * 2);
+    will-change: opacity;
 }
 
 .scroll-arrow {
@@ -88,10 +92,9 @@
 .title-container {
     text-align: center;
     opacity: 0;
-    transform: translateY(50px);
-    transition:
-        opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-        transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateY(calc((1 - var(--scroll-progress)) * 50px));
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
 }
 
 .title-container.visible {
