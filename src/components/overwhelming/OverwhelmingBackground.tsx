@@ -118,6 +118,7 @@ export function OverwhelmingBackground({
 
     return () => {
       timeouts.forEach(clearTimeout);
+      hasSpawnedRef.current = false; // Reset on cleanup so remount works
     };
   }, [itemCount, spawnInterval, initialDelay, generateSpawnPosition]);
 
