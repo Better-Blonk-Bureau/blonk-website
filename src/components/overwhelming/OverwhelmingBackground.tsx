@@ -69,16 +69,51 @@ export function OverwhelmingBackground({
   const containerRef = useRef<HTMLDivElement>(null);
   const hasSpawnedRef = useRef(false); // Prevent double-spawn in Strict Mode
 
-  // Generate a random spawn position
-  const generateSpawnPosition = useCallback(() => {
+  // Generate spawn positions using grid-with-jitter for better distribution
+  const generateSpawnPositions = useCallback((count: number) => {
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    // All items spawn scattered across viewport
-    return {
-      x: Math.random() * viewportWidth,
-      y: Math.random() * viewportHeight,
-    };
+    // Calculate grid dimensions based on item count and aspect ratio
+    const aspectRatio = viewportWidth / viewportHeight;
+    const cols = Math.ceil(Math.sqrt(count * aspectRatio));
+    const rows = Math.ceil(count / cols);
+
+    // Cell dimensions
+    const cellWidth = viewportWidth / cols;
+    const cellHeight = viewportHeight / rows;
+
+    // Jitter amount (how far from cell center items can spawn)
+    // 0.8 means items can move 80% of the way to cell edge
+    const jitter = 0.8;
+
+    const positions: { x: number; y: number }[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+
+      // Center of this cell
+      const centerX = (col + 0.5) * cellWidth;
+      const centerY = (row + 0.5) * cellHeight;
+
+      // Random offset within cell (jittered)
+      const offsetX = (Math.random() - 0.5) * cellWidth * jitter;
+      const offsetY = (Math.random() - 0.5) * cellHeight * jitter;
+
+      positions.push({
+        x: centerX + offsetX,
+        y: centerY + offsetY,
+      });
+    }
+
+    // Shuffle positions so items don't spawn in grid order
+    for (let i = positions.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [positions[i], positions[j]] = [positions[j], positions[i]];
+    }
+
+    return positions;
   }, []);
 
   // Initial spawn sequence
@@ -89,11 +124,12 @@ export function OverwhelmingBackground({
 
     const timeouts: ReturnType<typeof setTimeout>[] = [];
     const spawnList = generateSpawnList(itemCount);
+    const positions = generateSpawnPositions(itemCount);
 
     const startTimeout = setTimeout(() => {
       spawnList.forEach((configId, index) => {
         const timeout = setTimeout(() => {
-          const pos = generateSpawnPosition();
+          const pos = positions[index];
           const id = `item-${index}-${configId}`;
 
           const newItem: SpawnedItem = {
@@ -120,7 +156,7 @@ export function OverwhelmingBackground({
       timeouts.forEach(clearTimeout);
       hasSpawnedRef.current = false; // Reset on cleanup so remount works
     };
-  }, [itemCount, spawnInterval, initialDelay, generateSpawnPosition]);
+  }, [itemCount, spawnInterval, initialDelay, generateSpawnPositions]);
 
   // Mouse tracking for parallax - updates CSS variables directly, no React re-render
   useEffect(() => {
