@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import type { SpawnedItem, MousePosition } from './types';
+import { useState, useEffect, useCallback, useRef, memo } from 'react';
+import type { SpawnedItem } from './types';
 import { getRandomItem, itemRegistry } from './registry';
 import './OverwhelmingBackground.css';
 
@@ -9,13 +9,34 @@ interface OverwhelmingBackgroundProps {
   initialDelay?: number; // ms before first spawn
 }
 
+// Memoized item component - only re-renders when its own props change
+const OverwhelmingItem = memo(function OverwhelmingItem({ item }: { item: SpawnedItem }) {
+  const config = itemRegistry.find((c) => c.id === item.configId);
+  if (!config) return null;
+
+  return (
+    <div
+      className="overwhelming-item"
+      style={{
+        left: item.x,
+        top: item.y,
+        '--parallax-factor': item.parallaxFactor,
+        '--scale': item.scale,
+        '--rotation': `${item.rotation}deg`,
+        zIndex: item.zIndex,
+      } as React.CSSProperties}
+    >
+      {config.component()}
+    </div>
+  );
+});
+
 export function OverwhelmingBackground({
   itemCount = 100,
   spawnInterval = 150,
   initialDelay = 500,
 }: OverwhelmingBackgroundProps) {
   const [items, setItems] = useState<SpawnedItem[]>([]);
-  const [mousePos, setMousePos] = useState<MousePosition>({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
   const spawnedCountRef = useRef(0);
 
@@ -93,50 +114,31 @@ export function OverwhelmingBackground({
     };
   }, [itemCount, spawnInterval, initialDelay, spawnItem]);
 
-  // Mouse tracking for parallax
+  // Mouse tracking for parallax - updates CSS variables directly, no React re-render
   useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({
-        x: e.clientX - window.innerWidth / 2,
-        y: e.clientY - window.innerHeight / 2,
-      });
+      const x = e.clientX - window.innerWidth / 2;
+      const y = e.clientY - window.innerHeight / 2;
+      container.style.setProperty('--mouse-x', `${x}`);
+      container.style.setProperty('--mouse-y', `${y}`);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   return (
-    <div ref={containerRef} className="overwhelming-background">
-      {items.map((item) => {
-        const config = itemRegistry.find((c) => c.id === item.configId);
-        if (!config) return null;
-
-        // Calculate parallax offset
-        const parallaxX = mousePos.x * item.parallaxFactor;
-        const parallaxY = mousePos.y * item.parallaxFactor;
-
-        return (
-          <div
-            key={item.id}
-            className="overwhelming-item"
-            style={{
-              left: item.x,
-              top: item.y,
-              transform: `
-                translate(-50%, -50%)
-                translate(${parallaxX}px, ${parallaxY}px)
-                scale(${item.scale})
-                rotate(${item.rotation}deg)
-              `,
-              zIndex: item.zIndex,
-              animationDelay: `${item.delay}ms`,
-            }}
-          >
-            {config.component()}
-          </div>
-        );
-      })}
+    <div
+      ref={containerRef}
+      className="overwhelming-background"
+      style={{ '--mouse-x': '0', '--mouse-y': '0' } as React.CSSProperties}
+    >
+      {items.map((item) => (
+        <OverwhelmingItem key={item.id} item={item} />
+      ))}
     </div>
   );
 }
