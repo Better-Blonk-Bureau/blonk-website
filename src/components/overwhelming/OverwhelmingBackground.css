@@ -3,17 +3,17 @@
    ======================================== */
 
 .overwhelming-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-  /* CSS variables for parallax - updated by JS without React re-renders */
-  --mouse-x: 0;
-  --mouse-y: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    /* CSS variables for parallax - updated by JS without React re-renders */
+    --mouse-x: 0;
+    --mouse-y: 0;
 }
 
 /* ========================================
@@ -21,52 +21,55 @@
    ======================================== */
 
 .overwhelming-item {
-  position: absolute;
-  opacity: 0;
-  /* Use translate3d for GPU acceleration */
-  transform: translate3d(
-    calc(-50% + var(--mouse-x) * var(--parallax-factor) * 1px),
-    calc(-50% + var(--mouse-y) * var(--parallax-factor) * 1px),
-    0
-  ) scale(var(--scale, 1)) rotate(var(--rotation, 0deg));
-  animation: item-spawn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  will-change: transform;
-  /* Use contain for better performance */
-  contain: layout style;
+    position: absolute;
+    opacity: 0;
+    /* Use translate3d for GPU acceleration */
+    transform: translate3d(
+            calc(-50% + var(--mouse-x) * var(--parallax-factor) * 1px),
+            calc(-50% + var(--mouse-y) * var(--parallax-factor) * 1px),
+            0
+        )
+        scale(var(--scale, 1)) rotate(var(--rotation, 0deg));
+    animation: item-spawn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    will-change: transform;
+    /* Use contain for better performance */
+    contain: layout style;
 }
 
 @keyframes item-spawn {
-  0% {
-    opacity: 0;
-    transform: translate3d(-50%, -50%, 0) scale(0.3);
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(
-      calc(-50% + var(--mouse-x) * var(--parallax-factor) * 1px),
-      calc(-50% + var(--mouse-y) * var(--parallax-factor) * 1px),
-      0
-    ) scale(var(--scale, 1)) rotate(var(--rotation, 0deg));
-  }
+    0% {
+        opacity: 0;
+        transform: translate3d(-50%, -50%, 0) scale(0.3);
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(
+                calc(-50% + var(--mouse-x) * var(--parallax-factor) * 1px),
+                calc(-50% + var(--mouse-y) * var(--parallax-factor) * 1px),
+                0
+            )
+            scale(var(--scale, 1)) rotate(var(--rotation, 0deg));
+    }
 }
 
 /* Some items get a slight pulse animation after spawning */
 .overwhelming-item:nth-child(4n) {
-  animation:
-    item-spawn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
-    subtle-pulse 4s ease-in-out 0.6s infinite;
+    animation:
+        item-spawn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+        subtle-pulse 4s ease-in-out 0.6s infinite;
 }
 
 @keyframes subtle-pulse {
-  0%, 100% {
-    filter: brightness(1);
-  }
-  50% {
-    filter: brightness(1.1);
-  }
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.1);
+    }
 }
 
 /* ========================================
@@ -75,27 +78,27 @@
 
 /* Scale up items on larger screens */
 @media (min-width: 1400px) {
-  .overwhelming-item > * {
-    transform: scale(1.5);
-  }
+    .overwhelming-item > * {
+        transform: scale(1.5);
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .overwhelming-item {
-    animation: item-spawn-reduced 0.3s ease-out forwards;
-    transform: translate(-50%, -50%) scale(var(--scale, 1)) rotate(var(--rotation, 0deg));
-  }
-
-  .overwhelming-item:nth-child(4n) {
-    animation: item-spawn-reduced 0.3s ease-out forwards;
-  }
-
-  @keyframes item-spawn-reduced {
-    0% {
-      opacity: 0;
+    .overwhelming-item {
+        animation: item-spawn-reduced 0.3s ease-out forwards;
+        transform: translate(-50%, -50%) scale(var(--scale, 1)) rotate(var(--rotation, 0deg));
     }
-    100% {
-      opacity: 1;
+
+    .overwhelming-item:nth-child(4n) {
+        animation: item-spawn-reduced 0.3s ease-out forwards;
     }
-  }
+
+    @keyframes item-spawn-reduced {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
 }
