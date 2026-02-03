@@ -18,8 +18,8 @@ const OverwhelmingItem = memo(function OverwhelmingItem({ item }: { item: Spawne
     <div
       className="overwhelming-item"
       style={{
-        left: item.x,
-        top: item.y,
+        left: `${item.x}%`,
+        top: `${item.y}%`,
         '--parallax-factor': item.parallaxFactor,
         '--scale': item.scale,
         '--rotation': `${item.rotation}deg`,
@@ -70,18 +70,16 @@ export function OverwhelmingBackground({
   const hasSpawnedRef = useRef(false); // Prevent double-spawn in Strict Mode
 
   // Generate spawn positions using grid-with-jitter for better distribution
+  // Returns positions as percentages (0-100) so they adapt to viewport resize
   const generateSpawnPositions = useCallback((count: number) => {
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    // Calculate grid dimensions based on item count and aspect ratio
-    const aspectRatio = viewportWidth / viewportHeight;
+    // Calculate grid dimensions based on item count and typical aspect ratio
+    const aspectRatio = 16 / 9; // Use fixed aspect ratio for consistent grid
     const cols = Math.ceil(Math.sqrt(count * aspectRatio));
     const rows = Math.ceil(count / cols);
 
-    // Cell dimensions
-    const cellWidth = viewportWidth / cols;
-    const cellHeight = viewportHeight / rows;
+    // Cell dimensions as percentages
+    const cellWidth = 100 / cols;
+    const cellHeight = 100 / rows;
 
     // Jitter amount (how far from cell center items can spawn)
     // 0.8 means items can move 80% of the way to cell edge
@@ -93,7 +91,7 @@ export function OverwhelmingBackground({
       const col = i % cols;
       const row = Math.floor(i / cols);
 
-      // Center of this cell
+      // Center of this cell (as percentage)
       const centerX = (col + 0.5) * cellWidth;
       const centerY = (row + 0.5) * cellHeight;
 
