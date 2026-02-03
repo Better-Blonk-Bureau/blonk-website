@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import type { SpawnedItem } from './types';
-import { getRandomItem, itemRegistry } from './registry';
+import { itemRegistry } from './registry';
 import './OverwhelmingBackground.css';
 
 interface OverwhelmingBackgroundProps {
@@ -31,80 +31,87 @@ const OverwhelmingItem = memo(function OverwhelmingItem({ item }: { item: Spawne
   );
 });
 
+// Fisher-Yates shuffle
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+// Generate a list of items to spawn - prioritizes variety
+function generateSpawnList(count: number): string[] {
+  const result: string[] = [];
+  const allIds = itemRegistry.map((item) => item.id);
+
+  // First, add all unique items (shuffled)
+  const shuffled = shuffleArray(allIds);
+  result.push(...shuffled);
+
+  // If we need more, add another shuffled round
+  while (result.length < count) {
+    const moreShuffled = shuffleArray(allIds);
+    result.push(...moreShuffled);
+  }
+
+  // Trim to exact count
+  return result.slice(0, count);
+}
+
 export function OverwhelmingBackground({
-  itemCount = 100,
-  spawnInterval = 150,
-  initialDelay = 500,
+  itemCount = 50,
+  spawnInterval = 100,
+  initialDelay = 300,
 }: OverwhelmingBackgroundProps) {
   const [items, setItems] = useState<SpawnedItem[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const spawnedCountRef = useRef(0);
+  const hasSpawnedRef = useRef(false); // Prevent double-spawn in Strict Mode
 
-  // Generate a random spawn position (edges and scattered)
+  // Generate a random spawn position
   const generateSpawnPosition = useCallback(() => {
-    const padding = 50;
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
-    // Mix of edge spawning and scattered spawning
-    const spawnType = Math.random();
-
-    if (spawnType < 0.3) {
-      // Spawn from edges
-      const edge = Math.floor(Math.random() * 4);
-      switch (edge) {
-        case 0: // Top
-          return { x: Math.random() * viewportWidth, y: -padding };
-        case 1: // Right
-          return { x: viewportWidth + padding, y: Math.random() * viewportHeight };
-        case 2: // Bottom
-          return { x: Math.random() * viewportWidth, y: viewportHeight + padding };
-        case 3: // Left
-          return { x: -padding, y: Math.random() * viewportHeight };
-      }
-    }
-
-    // Scattered across viewport
+    // All items spawn scattered across viewport
     return {
       x: Math.random() * viewportWidth,
       y: Math.random() * viewportHeight,
     };
   }, []);
 
-  // Spawn a single item
-  const spawnItem = useCallback(() => {
-    const config = getRandomItem();
-    const pos = generateSpawnPosition();
-    const id = `item-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-
-    const newItem: SpawnedItem = {
-      id,
-      configId: config.id,
-      x: pos.x,
-      y: pos.y,
-      scale: 0.7 + Math.random() * 0.6, // 0.7 to 1.3
-      rotation: (Math.random() - 0.5) * 20, // -10 to 10 degrees
-      delay: 0,
-      zIndex: spawnedCountRef.current,
-      parallaxFactor: 0.02 + Math.random() * 0.08, // 0.02 to 0.1
-    };
-
-    spawnedCountRef.current++;
-    setItems((prev) => [...prev, newItem]);
-  }, [generateSpawnPosition]);
-
   // Initial spawn sequence
   useEffect(() => {
-    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    // Prevent double-spawning in React Strict Mode
+    if (hasSpawnedRef.current) return;
+    hasSpawnedRef.current = true;
 
-    // Start spawning after initial delay
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
+    const spawnList = generateSpawnList(itemCount);
+
     const startTimeout = setTimeout(() => {
-      for (let i = 0; i < itemCount; i++) {
+      spawnList.forEach((configId, index) => {
         const timeout = setTimeout(() => {
-          spawnItem();
-        }, i * spawnInterval);
+          const pos = generateSpawnPosition();
+          const id = `item-${index}-${configId}`;
+
+          const newItem: SpawnedItem = {
+            id,
+            configId,
+            x: pos.x,
+            y: pos.y,
+            scale: 0.8 + Math.random() * 0.4, // 0.8 to 1.2
+            rotation: (Math.random() - 0.5) * 16, // -8 to 8 degrees
+            delay: 0,
+            zIndex: index,
+            parallaxFactor: 0.02 + Math.random() * 0.06, // 0.02 to 0.08
+          };
+
+          setItems((prev) => [...prev, newItem]);
+        }, index * spawnInterval);
         timeouts.push(timeout);
-      }
+      });
     }, initialDelay);
 
     timeouts.push(startTimeout);
@@ -112,7 +119,7 @@ export function OverwhelmingBackground({
     return () => {
       timeouts.forEach(clearTimeout);
     };
-  }, [itemCount, spawnInterval, initialDelay, spawnItem]);
+  }, [itemCount, spawnInterval, initialDelay, generateSpawnPosition]);
 
   // Mouse tracking for parallax - updates CSS variables directly, no React re-render
   useEffect(() => {
