@@ -25,7 +25,7 @@ export function LandingPage() {
   return (
     <div className="landing-page">
       {/* Overwhelming background - always visible */}
-      <OverwhelmingBackground itemCount={100} spawnInterval={120} initialDelay={300} />
+      <OverwhelmingBackground itemCount={50} spawnInterval={100} initialDelay={300} />
 
       {/* Gradient overlay that fades in on scroll */}
       <div
