@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { OverwhelmingBackground } from '../components/overwhelming';
 import { GrainSettings } from '../components/GrainSettings';
+import { Logo3D } from '../components/Logo3D';
 import pompompurinGif from '../assets/pompompurin.gif';
 import './LandingPage.css';
 
@@ -31,9 +32,7 @@ export function LandingPage() {
                     <p className="text-xs uppercase tracking-[0.4em] text-muted">
                         Better Blonk Bureau presents
                     </p>
-                    <h1 className="text-[clamp(72px,18vw,200px)] font-semibold tracking-[-0.05em] text-transparent">
-                        <span className="title-gradient">blonk</span>
-                    </h1>
+                    <Logo3D />
 
                     <div className="mt-4 flex items-center gap-4">
                         <a href="mailto:hello@blonk.app" className="transition hover:opacity-80">
