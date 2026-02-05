@@ -5,7 +5,7 @@
 @layer base {
     :root {
         --font-sans: 'SF Pro Display';
-        --color-bg: 10 10 10;
+        --color-bg: 224 85 48;
         --color-fg: 248 250 252;
         --color-muted: 148 163 184;
         --color-accent: 226 232 240;
@@ -17,19 +17,19 @@
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        background-color: rgb(var(--color-bg));
         color: rgb(var(--color-fg));
     }
 
-    html {
-        scroll-behavior: smooth;
+    html,
+    body {
+        overflow: hidden;
+        overscroll-behavior: none;
     }
 
     body {
         min-width: 320px;
-        min-height: 100vh;
-        overflow-x: hidden;
-        background-color: rgb(var(--color-bg));
+        height: 100vh;
+        position: relative;
     }
 
     ::selection {
