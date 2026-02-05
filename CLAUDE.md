@@ -15,3 +15,4 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - React 19 with TypeScript
 - Vite 7 with SWC for fast compilation
 - ESLint with TypeScript and React hooks plugins
+- Tailwind

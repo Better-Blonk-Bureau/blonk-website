@@ -1,69 +1,54 @@
-import { useEffect, useRef } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { OverwhelmingBackground } from '../components/overwhelming';
+import { GrainSettings } from '../components/GrainSettings';
+import { Logo3D } from '../components/Logo3D';
+import pompompurinGif from '../assets/pompompurin.gif';
 import './LandingPage.css';
 
+const fadeUp = {
+    hidden: { opacity: 0, y: 24 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
+    },
+};
+
 export function LandingPage() {
-    const pageRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (!pageRef.current) return;
-
-            const scrollY = window.scrollY;
-            const windowHeight = window.innerHeight;
-            const progress = Math.min(scrollY / windowHeight, 1);
-
-            // Update CSS variable directly - no React re-render
-            pageRef.current.style.setProperty('--scroll-progress', String(progress));
-
-            // Toggle class for title visibility (only when crossing threshold)
-            const titleContainer = pageRef.current.querySelector('.title-container');
-            if (titleContainer) {
-                titleContainer.classList.toggle('visible', progress > 0.3);
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    const reduceMotion = useReducedMotion();
 
     return (
-        <div className="landing-page" ref={pageRef}>
-            {/* Overwhelming background - always visible */}
-            <OverwhelmingBackground itemCount={50} spawnInterval={100} initialDelay={300} />
+        <div className="relative min-h-screen text-fg">
+            <GrainSettings />
+            <OverwhelmingBackground itemCount={36} spawnInterval={120} initialDelay={200} />
 
-            {/* Gradient overlay that fades in on scroll */}
-            <div className="scroll-overlay" />
+            <section className="relative z-10 flex min-h-screen items-center justify-center px-6">
+                <motion.div
+                    className="flex max-w-3xl flex-col items-center gap-6 text-center"
+                    initial={reduceMotion ? false : 'hidden'}
+                    animate="visible"
+                    variants={reduceMotion ? undefined : fadeUp}
+                >
+                    <p className="text-xs uppercase tracking-[0.4em] text-muted">
+                        Better Blonk Bureau presents
+                    </p>
+                    <Logo3D />
 
-            {/* First viewport - just the chaos */}
-            <section className="hero-section">
-                <div className="scroll-hint">
-                    <span>scroll down</span>
-                    <div className="scroll-arrow">
-                        <span>&#8595;</span>
+                    <div className="mt-4 flex items-center gap-4">
+                        <a href="mailto:hello@blonk.app" className="transition hover:opacity-80">
+                            <img
+                                src="/app-store-download-black-usa.svg"
+                                alt="Download on the App Store"
+                                className="h-12"
+                            />
+                        </a>
+                        <img
+                            src={pompompurinGif}
+                            alt="Pompompurin"
+                            className="pompompurin h-12"
+                        />
                     </div>
-                </div>
-            </section>
-
-            {/* Second viewport - the reveal */}
-            <section className="reveal-section">
-                <div className="title-container">
-                    <p className="presents">Better Blonk Bureau presents:</p>
-                    <h1 className="main-title">
-                        <span className="title-blonk">blonk</span>
-                    </h1>
-                    <p className="tagline">take back your time</p>
-                </div>
-            </section>
-
-            {/* Additional content section */}
-            <section className="info-section">
-                <div className="info-content">
-                    <p className="coming-soon">coming soon to iOS</p>
-                    <a href="mailto:hello@blonk.app" className="contact-link">
-                        hello@blonk.app
-                    </a>
-                </div>
+                </motion.div>
             </section>
         </div>
     );
